@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vizcom Video Pipeline</title>
+    <title>Video Editing Pipeline</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
@@ -401,7 +401,7 @@
 
     <!-- HERO -->
     <section class="hero" style="border: none;">
-        <div class="hero-label">Vizcom / Video Pipeline</div>
+        <div class="hero-label">Video Editing Pipeline</div>
         <h1>Raw footage in.<br><span>Finished video</span> out.</h1>
         <p class="hero-sub">Paste a Google Drive link, describe what you want, and Claude assembles a polished social video automatically. No editing software required.</p>
         <div class="hero-rule"></div>
@@ -434,9 +434,9 @@
             <span class="muted"># Example prompt</span><br><br>
             <span class="accent">@Claude</span> Here's the footage:<br>
             https://drive.google.com/drive/folders/abc123<br><br>
-            Make a 60s Reel. Pen tray design-to-print process.<br>
-            Start with the pen throwing shot, then talking head.<br>
-            Fast paced, time-lapse the Vizcom and 3D print parts.
+            Make a 60s Reel. Start with the action shot,<br>
+            then talking head intro. Speed up the process<br>
+            footage 3x, end with the final product reveal.
         </div>
 
         <p>Claude downloads the footage, analyzes every clip, finds clean takes (auto-skips mistakes), assembles everything with transitions and music, and uploads the finished MP4 back to Drive.</p>
@@ -469,8 +469,8 @@
     <!-- STYLE GUIDE -->
     <section id="style" class="reveal">
         <div class="section-num">02 / Style guide</div>
-        <h2>Standard shot structure</h2>
-        <p>The default template for design-to-3D-print process videos. Claude follows this automatically unless you specify otherwise.</p>
+        <h2>Recommended shot structure</h2>
+        <p>A starting template for short-form videos. Claude follows this by default &mdash; or tell it your own structure and it will adapt.</p>
 
         <table>
             <thead>
@@ -484,27 +484,22 @@
                 <tr>
                     <td><strong>Hook</strong></td>
                     <td>~5s</td>
-                    <td>Action shot, props, or direct-to-camera question</td>
+                    <td>Action shot, dramatic angle, or direct-to-camera question</td>
                 </tr>
                 <tr>
-                    <td><strong>Sketching</strong></td>
-                    <td>~10s</td>
-                    <td>Top-down iPad sketching, sweeping angles</td>
-                </tr>
-                <tr>
-                    <td><strong>Vizcom</strong></td>
-                    <td>~15-20s</td>
-                    <td>Screen recording of Vizcom, time-lapsed 2&ndash;4x</td>
-                </tr>
-                <tr>
-                    <td><strong>3D Print</strong></td>
-                    <td>~10s</td>
-                    <td>Slicer, print timelapse, pulling piece off bed</td>
-                </tr>
-                <tr>
-                    <td><strong>Reveal</strong></td>
+                    <td><strong>Intro</strong></td>
                     <td>~5-10s</td>
-                    <td>Final product in context, hero shots</td>
+                    <td>Talking head or text overlay setting up the story</td>
+                </tr>
+                <tr>
+                    <td><strong>Process</strong></td>
+                    <td>~20-30s</td>
+                    <td>Core content &mdash; demos, screen recordings, hands-on work (2&ndash;4x speed)</td>
+                </tr>
+                <tr>
+                    <td><strong>Result</strong></td>
+                    <td>~5-10s</td>
+                    <td>Final product or outcome &mdash; hero shots from multiple angles</td>
                 </tr>
                 <tr>
                     <td><strong>Closing</strong></td>
@@ -547,23 +542,10 @@
             </tbody>
         </table>
 
-        <h3>Brand reference</h3>
-        <table>
-            <thead>
-                <tr><th>Element</th><th>Value</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Font</td><td>Matter</td></tr>
-                <tr><td>Neutrals</td><td>Canvas White, Paper Gray, Diamond Gray, Ink Black</td></tr>
-                <tr><td>Accents</td><td>Red, Yellow, Green, Pink, Purple</td></tr>
-                <tr><td>Tone</td><td>Experimental, Empowering, Dynamic</td></tr>
-            </tbody>
-        </table>
-
         <h3>Tips for best results</h3>
         <ul>
             <li><strong>Start with action, not talking.</strong> Lead with a visual hook &mdash; then cut to the talking head.</li>
-            <li><strong>Focus on the product.</strong> Every clip should feature the product or process. Cut anything irrelevant.</li>
+            <li><strong>Stay focused.</strong> Every clip should serve the story. Cut anything that doesn't move things forward.</li>
             <li><strong>Multiple takes are fine.</strong> Claude detects silence gaps and uses only the clean take.</li>
             <li><strong>Speed ramps matter.</strong> Screen recordings and process shots should be 2&ndash;4x. Talking heads stay at 1x.</li>
             <li><strong>Music goes under, not over.</strong> 10&ndash;15% volume under talking, louder during B-roll.</li>
@@ -574,15 +556,13 @@
     <section id="footage" class="reveal">
         <div class="section-num">03 / Providing footage</div>
         <h2>What to film</h2>
-        <p>For a standard design-to-3D-print video, gather these clips:</p>
+        <p>Gather a mix of these clip types:</p>
 
         <ul class="checklist">
-            <li><strong>Talking head clips</strong> &mdash; scripted segments at desk. Multiple takes are fine.</li>
-            <li><strong>iPad sketching</strong> &mdash; top-down shot of sketching the design</li>
-            <li><strong>Vizcom screen recording</strong> &mdash; the full design process (screen capture)</li>
-            <li><strong>3D print footage</strong> &mdash; slicer software, print timelapse, finished piece removal</li>
-            <li><strong>Product hero shots</strong> &mdash; final product from multiple angles, in context</li>
-            <li><strong>Action / B-roll</strong> &mdash; throwing props, dramatic angles, hook material</li>
+            <li><strong>Talking head</strong> &mdash; scripted segments with good audio. Multiple takes are fine.</li>
+            <li><strong>Process footage</strong> &mdash; screen recordings, hands-on work, timelapses of the main activity</li>
+            <li><strong>B-roll</strong> &mdash; close-ups, dramatic angles, action shots, anything visually interesting</li>
+            <li><strong>Final result</strong> &mdash; the finished product or outcome from multiple angles, in context</li>
         </ul>
 
         <h3>How to share</h3>
@@ -593,7 +573,7 @@
         </ol>
 
         <div class="callout">
-            <p><strong>Be as specific or as vague as you like.</strong> You can say <em>"make a 60s Reel"</em> and Claude will figure out the structure, or you can specify exact clip ordering: <em>"start with the pen throw, then cut to talking head, time-lapse the Vizcom part."</em></p>
+            <p><strong>Be as specific or as vague as you like.</strong> You can say <em>"make a 60s Reel"</em> and Claude will figure out the structure, or you can specify exact clip ordering: <em>"start with the action shot, then talking head intro, speed up the process footage."</em></p>
         </div>
     </section>
 
@@ -605,8 +585,8 @@
 
         <div class="code-block">
             <span class="muted"># 1. Clone the repo</span><br>
-            git clone https://github.com/vizcomtech/vizcom-video-pipeline.git<br>
-            cd vizcom-video-pipeline<br><br>
+            git clone https://github.com/amywork777/video-editing-pipeline.git<br>
+            cd video-editing-pipeline<br><br>
             <span class="muted"># 2. Run setup (installs ffmpeg, creates dirs)</span><br>
             ./scripts/setup.sh<br><br>
             <span class="muted"># 3. Copy Google Drive credentials (ask Amy)</span><br>
@@ -629,12 +609,12 @@
         </table>
 
         <div class="callout">
-            <p>Full technical documentation, the skill file, and MCP server configuration are all in the <a href="https://github.com/vizcomtech/vizcom-video-pipeline" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);">GitHub repo</a>.</p>
+            <p>Full technical documentation, the skill file, and MCP server configuration are all in the <a href="https://github.com/amywork777/video-editing-pipeline" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);">GitHub repo</a>.</p>
         </div>
     </section>
 
     <footer>
-        <p>Vizcom Video Pipeline &mdash; Built by <a href="mailto:amy.zhou@vizcom.com">Amy Zhou</a> &mdash; Powered by Claude Code + ffmpeg</p>
+        <p>Video Editing Pipeline &mdash; Powered by Claude Code + ffmpeg</p>
     </footer>
 
 </div>
