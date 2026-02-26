@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizcom Video Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ink: #0a0a0a;
+            --paper: #f5f3f0;
+            --stone: #d4d0ca;
+            --steel: #8a8680;
+            --dim: #b8b4ae;
+            --accent: #e63920;
+            --mono: 'Space Mono', monospace;
+            --sans: 'DM Sans', -apple-system, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 9999;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ---- HERO ---- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            padding: 4rem 0;
+        }
+
+        .hero-label {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--steel);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.2s;
+        }
+
+        .hero h1 {
+            font-family: var(--sans);
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            max-width: 14ch;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.4s;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 1.15rem;
+            color: var(--steel);
+            margin-top: 1.5rem;
+            max-width: 48ch;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.6s;
+        }
+
+        .hero-rule {
+            width: 48px;
+            height: 2px;
+            background: var(--ink);
+            margin-top: 3rem;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 0.8s;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--dim);
+            writing-mode: vertical-rl;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards 1s;
+        }
+
+        /* ---- SECTIONS ---- */
+        section {
+            padding: 6rem 0;
+            border-top: 1px solid var(--stone);
+        }
+
+        .section-num {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-family: var(--sans);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            margin-top: 3rem;
+            color: var(--ink);
+        }
+
+        p, li {
+            font-size: 1rem;
+            color: #3a3835;
+            line-height: 1.7;
+        }
+
+        p + p { margin-top: 1rem; }
+
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        li { margin-bottom: 0.4rem; }
+        li::marker { color: var(--dim); }
+
+        /* ---- FLOW DIAGRAM ---- */
+        .flow {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            margin: 3rem 0;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .flow-step {
+            flex: 1;
+            min-width: 140px;
+            padding: 1.25rem 1rem;
+            background: var(--ink);
+            color: var(--paper);
+            position: relative;
+        }
+
+        .flow-step:first-child { border-radius: 6px 0 0 6px; }
+        .flow-step:last-child { border-radius: 0 6px 6px 0; }
+
+        .flow-step::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 40%;
+            background: var(--steel);
+        }
+
+        .flow-step:last-child::after { display: none; }
+
+        .flow-num {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--steel);
+            margin-bottom: 0.5rem;
+        }
+
+        .flow-label {
+            font-family: var(--sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        /* ---- TABLE ---- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid var(--ink);
+            color: var(--steel);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--stone);
+            color: #3a3835;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* ---- CODE ---- */
+        .code-block {
+            background: var(--ink);
+            color: #c8c4be;
+            padding: 1.5rem;
+            border-radius: 6px;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        .code-block .accent { color: var(--accent); }
+        .code-block .muted { color: var(--steel); }
+
+        code {
+            font-family: var(--mono);
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.06);
+            padding: 0.15em 0.4em;
+            border-radius: 3px;
+        }
+
+        /* ---- CALLOUT ---- */
+        .callout {
+            border-left: 3px solid var(--accent);
+            padding: 1.25rem 1.5rem;
+            margin: 2rem 0;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .callout p {
+            font-size: 0.95rem;
+        }
+
+        /* ---- CHECKLIST ---- */
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+            margin: 1.5rem 0;
+        }
+
+        .checklist li {
+            padding: 0.5rem 0 0.5rem 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--stone);
+        }
+
+        .checklist li:last-child { border-bottom: none; }
+
+        .checklist li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid var(--steel);
+            border-radius: 2px;
+        }
+
+        /* ---- FOOTER ---- */
+        footer {
+            padding: 3rem 0;
+            border-top: 1px solid var(--stone);
+            text-align: center;
+        }
+
+        footer p {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: var(--dim);
+        }
+
+        footer a {
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid var(--stone);
+            transition: border-color 0.2s;
+        }
+
+        footer a:hover { border-color: var(--ink); }
+
+        /* ---- NAV ---- */
+        nav {
+            position: fixed;
+            top: 0;
+            right: 2rem;
+            z-index: 100;
+            padding: 1.5rem 0;
+        }
+
+        nav a {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--dim);
+            margin-left: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: var(--ink); }
+
+        /* ---- ANIMATIONS ---- */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 640px) {
+            .container { padding: 0 1.25rem; }
+            section { padding: 4rem 0; }
+            nav { display: none; }
+            .flow { flex-direction: column; }
+            .flow-step { border-radius: 0 !important; }
+            .flow-step:first-child { border-radius: 6px 6px 0 0 !important; }
+            .flow-step:last-child { border-radius: 0 0 6px 6px !important; }
+            .flow-step::after {
+                right: 50%;
+                top: auto;
+                bottom: -1px;
+                transform: translateX(50%);
+                width: 40%;
+                height: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#how">How it works</a>
+    <a href="#style">Style guide</a>
+    <a href="#footage">Footage</a>
+    <a href="#setup">Setup</a>
+</nav>
+
+<div class="container">
+
+    <!-- HERO -->
+    <section class="hero" style="border: none;">
+        <div class="hero-label">Vizcom / Video Pipeline</div>
+        <h1>Raw footage in.<br><span>Finished video</span> out.</h1>
+        <p class="hero-sub">Paste a Google Drive link, describe what you want, and Claude assembles a polished social video automatically. No editing software required.</p>
+        <div class="hero-rule"></div>
+        <div class="hero-scroll">Scroll</div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="reveal">
+        <div class="section-num">01 / How it works</div>
+        <h2>Three steps. That's it.</h2>
+
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-num">01</div>
+                <div class="flow-label">Upload footage to Google Drive</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">02</div>
+                <div class="flow-label">Ask Claude what you want</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">03</div>
+                <div class="flow-label">Get a finished MP4 back</div>
+            </div>
+        </div>
+
+        <p>Upload your raw footage to a shared Google Drive folder. Then tell Claude what you need &mdash; in Slack, in Claude Code, wherever you talk to it:</p>
+
+        <div class="code-block">
+            <span class="muted"># Example prompt</span><br><br>
+            <span class="accent">@Claude</span> Here's the footage:<br>
+            https://drive.google.com/drive/folders/abc123<br><br>
+            Make a 60s Reel. Pen tray design-to-print process.<br>
+            Start with the pen throwing shot, then talking head.<br>
+            Fast paced, time-lapse the Vizcom and 3D print parts.
+        </div>
+
+        <p>Claude downloads the footage, analyzes every clip, finds clean takes (auto-skips mistakes), assembles everything with transitions and music, and uploads the finished MP4 back to Drive.</p>
+
+        <h3>Under the hood</h3>
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-num">A</div>
+                <div class="flow-label">Download from Drive</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">B</div>
+                <div class="flow-label">Analyze clips + extract frames</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">C</div>
+                <div class="flow-label">Detect clean takes</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">D</div>
+                <div class="flow-label">Assemble with ffmpeg</div>
+            </div>
+            <div class="flow-step">
+                <div class="flow-num">E</div>
+                <div class="flow-label">Upload MP4 to Drive</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STYLE GUIDE -->
+    <section id="style" class="reveal">
+        <div class="section-num">02 / Style guide</div>
+        <h2>Standard shot structure</h2>
+        <p>The default template for design-to-3D-print process videos. Claude follows this automatically unless you specify otherwise.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Section</th>
+                    <th>Duration</th>
+                    <th>Content</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Hook</strong></td>
+                    <td>~5s</td>
+                    <td>Action shot, props, or direct-to-camera question</td>
+                </tr>
+                <tr>
+                    <td><strong>Sketching</strong></td>
+                    <td>~10s</td>
+                    <td>Top-down iPad sketching, sweeping angles</td>
+                </tr>
+                <tr>
+                    <td><strong>Vizcom</strong></td>
+                    <td>~15-20s</td>
+                    <td>Screen recording of Vizcom, time-lapsed 2&ndash;4x</td>
+                </tr>
+                <tr>
+                    <td><strong>3D Print</strong></td>
+                    <td>~10s</td>
+                    <td>Slicer, print timelapse, pulling piece off bed</td>
+                </tr>
+                <tr>
+                    <td><strong>Reveal</strong></td>
+                    <td>~5-10s</td>
+                    <td>Final product in context, hero shots</td>
+                </tr>
+                <tr>
+                    <td><strong>Closing</strong></td>
+                    <td>~5s</td>
+                    <td>Talking head wrap-up or CTA</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Output formats</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Platform</th>
+                    <th>Dimensions</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TikTok / Reels / Shorts</td>
+                    <td>1080 &times; 1920</td>
+                    <td>30&ndash;60s</td>
+                </tr>
+                <tr>
+                    <td>Instagram Feed</td>
+                    <td>1080 &times; 1080</td>
+                    <td>30&ndash;60s</td>
+                </tr>
+                <tr>
+                    <td>LinkedIn</td>
+                    <td>1080 &times; 1080 / 1920 &times; 1080</td>
+                    <td>1&ndash;3 min</td>
+                </tr>
+                <tr>
+                    <td>YouTube</td>
+                    <td>1920 &times; 1080</td>
+                    <td>3&ndash;10 min</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Brand reference</h3>
+        <table>
+            <thead>
+                <tr><th>Element</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Font</td><td>Matter</td></tr>
+                <tr><td>Neutrals</td><td>Canvas White, Paper Gray, Diamond Gray, Ink Black</td></tr>
+                <tr><td>Accents</td><td>Red, Yellow, Green, Pink, Purple</td></tr>
+                <tr><td>Tone</td><td>Experimental, Empowering, Dynamic</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Tips for best results</h3>
+        <ul>
+            <li><strong>Start with action, not talking.</strong> Lead with a visual hook &mdash; then cut to the talking head.</li>
+            <li><strong>Focus on the product.</strong> Every clip should feature the product or process. Cut anything irrelevant.</li>
+            <li><strong>Multiple takes are fine.</strong> Claude detects silence gaps and uses only the clean take.</li>
+            <li><strong>Speed ramps matter.</strong> Screen recordings and process shots should be 2&ndash;4x. Talking heads stay at 1x.</li>
+            <li><strong>Music goes under, not over.</strong> 10&ndash;15% volume under talking, louder during B-roll.</li>
+        </ul>
+    </section>
+
+    <!-- FOOTAGE -->
+    <section id="footage" class="reveal">
+        <div class="section-num">03 / Providing footage</div>
+        <h2>What to film</h2>
+        <p>For a standard design-to-3D-print video, gather these clips:</p>
+
+        <ul class="checklist">
+            <li><strong>Talking head clips</strong> &mdash; scripted segments at desk. Multiple takes are fine.</li>
+            <li><strong>iPad sketching</strong> &mdash; top-down shot of sketching the design</li>
+            <li><strong>Vizcom screen recording</strong> &mdash; the full design process (screen capture)</li>
+            <li><strong>3D print footage</strong> &mdash; slicer software, print timelapse, finished piece removal</li>
+            <li><strong>Product hero shots</strong> &mdash; final product from multiple angles, in context</li>
+            <li><strong>Action / B-roll</strong> &mdash; throwing props, dramatic angles, hook material</li>
+        </ul>
+
+        <h3>How to share</h3>
+        <ol>
+            <li>Upload all clips to a Google Drive folder</li>
+            <li>Share the folder link with Claude</li>
+            <li>Describe what you want: format, duration, style, clip order</li>
+        </ol>
+
+        <div class="callout">
+            <p><strong>Be as specific or as vague as you like.</strong> You can say <em>"make a 60s Reel"</em> and Claude will figure out the structure, or you can specify exact clip ordering: <em>"start with the pen throw, then cut to talking head, time-lapse the Vizcom part."</em></p>
+        </div>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup" class="reveal">
+        <div class="section-num">04 / Technical setup</div>
+        <h2>Getting started</h2>
+        <p>One-time setup for running the pipeline on your machine or a VM.</p>
+
+        <div class="code-block">
+            <span class="muted"># 1. Clone the repo</span><br>
+            git clone https://github.com/vizcomtech/vizcom-video-pipeline.git<br>
+            cd vizcom-video-pipeline<br><br>
+            <span class="muted"># 2. Run setup (installs ffmpeg, creates dirs)</span><br>
+            ./scripts/setup.sh<br><br>
+            <span class="muted"># 3. Copy Google Drive credentials (ask Amy)</span><br>
+            cp /path/to/credentials ~/.google_workspace_mcp/credentials/<br><br>
+            <span class="muted"># 4. Start Claude Code</span><br>
+            <span class="accent">claude</span>
+        </div>
+
+        <p>Claude reads the <code>CLAUDE.md</code> file automatically and knows the full pipeline. Just give it a Drive link and tell it what you want.</p>
+
+        <h3>Requirements</h3>
+        <table>
+            <thead><tr><th>Tool</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td>Claude Code</td><td>CLI tool from Anthropic</td></tr>
+                <tr><td>ffmpeg</td><td>Installed automatically by setup script</td></tr>
+                <tr><td>Google Drive credentials</td><td>Ask Amy for the auth files</td></tr>
+                <tr><td>macOS or Linux</td><td>VM or local machine</td></tr>
+            </tbody>
+        </table>
+
+        <div class="callout">
+            <p>Full technical documentation, the skill file, and MCP server configuration are all in the <a href="https://github.com/vizcomtech/vizcom-video-pipeline" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);">GitHub repo</a>.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>Vizcom Video Pipeline &mdash; Built by <a href="mailto:amy.zhou@vizcom.com">Amy Zhou</a> &mdash; Powered by Claude Code + ffmpeg</p>
+    </footer>
+
+</div>
+
+<script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
